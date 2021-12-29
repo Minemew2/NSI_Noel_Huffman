@@ -110,6 +110,8 @@ class Compression_Huffman:
         f.truncate(0)  # on efface le contenu du fichier, au cas où il y a déjà des choses dedans
         f.write(texte_code)
 
+        return texte_code
+
 
 if __name__ == "__main__":
     ch = Compression_Huffman()
