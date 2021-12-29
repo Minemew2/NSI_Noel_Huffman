@@ -84,6 +84,32 @@ class Compression_Huffman:
 
         return dico_binaire
 
+    def ajouter_texte(self, fichier):
+        texte = open(fichier, "r")
+        variable_texte = texte.read()
+        return variable_texte
+
+    def coder_texte(self, fichier):
+        texte = self.ajouter_texte(fichier)
+        self.table_frequences(texte)
+        self.table_frequences_rangee()
+        self.Construire_arbre(self.tab_frq[0][0], self.tab_frq[1][0])
+        self.Coder_pseudo_binaire(self.arbre.racine)
+        dico_trie = self.Coder_binaire(self.dict_bin)
+        # on écrit dans le fichier texte avec des vrais nombres
+        texte_code = ""
+        for x in texte:
+            ajout = dico_trie.get(x)
+            passage = bin(ajout[0])
+            for deux in range(2):
+                passage = passage[1:]
+            texte_code += passage
+        int(texte_code)
+
+        f = open("textecoder.txt", "w+")
+        f.truncate(0)  # on efface le contenu du fichier, au cas où il y a déjà des choses dedans
+        f.write(texte_code)
+
 
 if __name__ == "__main__":
     ch = Compression_Huffman()
@@ -96,3 +122,8 @@ if __name__ == "__main__":
     print(ch.Coder_pseudo_binaire(ch.arbre.racine))
     print("vrai binaire :")
     print(ch.Coder_binaire(ch.dict_bin))
+    fichier_texte = ch.ajouter_texte("texte.txt")
+    # print(fichier_texte)
+
+    hu = Compression_Huffman()
+    hu.coder_texte("texte.txt")
