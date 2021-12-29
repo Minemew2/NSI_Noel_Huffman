@@ -94,4 +94,5 @@ if __name__ == "__main__":
     # ch.arbre.Parcours_largeur(ch.arbre.racine)
     # print(ch.arbre.racine.fgauche.contenu)
     print(ch.Coder_pseudo_binaire(ch.arbre.racine))
+    print("vrai binaire :")
     print(ch.Coder_binaire(ch.dict_bin))
