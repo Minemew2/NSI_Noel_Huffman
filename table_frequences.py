@@ -7,6 +7,7 @@ class Compression_Huffman:
         self.tab_frq = []
         self.arbre = None
         self.dict_bin = {}
+        self.texte_coder = 0
 
     def table_frequences(self, texte):
         for car in texte:
@@ -65,7 +66,6 @@ class Compression_Huffman:
             n3 = Noeud_bin(None, n2, n1)
             self.tab_frq = self.tab_frq[2:]
             self.tab_frq.insert(0, (n3, o1 + o2))
-            print(self.tab_frq)
             self.Construire_arbre(self.tab_frq[0][0], self.tab_frq[1][0])
 
     def Coder_pseudo_binaire(self, noeud, bin=""):
@@ -104,28 +104,56 @@ class Compression_Huffman:
             for deux in range(2):
                 passage = passage[1:]
             texte_code += passage
-        int(texte_code)
+        texte_code = int(texte_code)
 
         f = open("textecoder.txt", "w+")
         f.truncate(0)  # on efface le contenu du fichier, au cas où il y a déjà des choses dedans
-        f.write(texte_code)
+        f.write("%d" % texte_code)  # c'est du texte, mais la variable texte_code
+        # reste compressé
+
+        self.texte_coder += int(texte_code)
 
         return texte_code
 
+    def decoder_texte(self, fichiercoder):
+        f = fichiercoder
+        arbre_decode = self.arbre
+        noeud = arbre_decode.racine
+        texte_decoder = ""
+        listetravail = [int(x) for x in str(f)]
+        for x in listetravail:
+            if x == 1:
+                noeud = noeud.fgauche
+                if noeud.contenu is not None:
+                    if noeud.est_feuille:
+                        texte_decoder += noeud.contenu
+                        noeud = arbre_decode.racine
+
+            elif x == 0:
+                noeud = noeud.fdroit
+                if noeud.contenu is not None:
+                    if noeud.est_feuille:
+                        texte_decoder += noeud.contenu
+                        noeud = arbre_decode.racine
+            print(texte_decoder)
+
 
 if __name__ == "__main__":
-    ch = Compression_Huffman()
-    dict = ch.table_frequences("eeaaaapppppddd")
-    print(dict)
-    print(ch.table_frequences_rangee())
-    ch.Construire_arbre(ch.tab_frq[0][0], ch.tab_frq[1][0])
+    # ch = Compression_Huffman()
+    # dict = ch.table_frequences("eeaaaapppppddd")
+    # print(dict)
+    # print(ch.table_frequences_rangee())
+    # ch.Construire_arbre(ch.tab_frq[0][0], ch.tab_frq[1][0])
     # ch.arbre.Parcours_largeur(ch.arbre.racine)
     # print(ch.arbre.racine.fgauche.contenu)
-    print(ch.Coder_pseudo_binaire(ch.arbre.racine))
-    print("vrai binaire :")
-    print(ch.Coder_binaire(ch.dict_bin))
-    fichier_texte = ch.ajouter_texte("texte.txt")
+    # print(ch.Coder_pseudo_binaire(ch.arbre.racine))
+    # print("vrai binaire :")
+    # print(ch.Coder_binaire(ch.dict_bin))
+    # fichier_texte = ch.ajouter_texte("texte.txt")
     # print(fichier_texte)
 
     hu = Compression_Huffman()
     hu.coder_texte("texte.txt")
+    txtcode = hu.texte_coder
+    print(type(txtcode))
+    hu.decoder_texte(hu.texte_coder)
