@@ -147,6 +147,15 @@ class Compression_Huffman:
 
         return texte_decoder
 
+    def valeur_compression(self, fichier="texte.txt"):
+        f = open(fichier, "r")
+        poids_decode = len(f.read())  # en octets
+        poids_code = len(str(self.texte_coder))//8  # en octets
+        print(poids_code, " VS ", poids_decode)
+
+        print("la valeur de compression est de ", (poids_code/poids_decode)*100, "%")
+        return poids_code/poids_decode*100
+
 if __name__ == "__main__":
     # ch = Compression_Huffman()
     # dict = ch.table_frequences("eeaaaapppppddd")
@@ -169,3 +178,5 @@ if __name__ == "__main__":
     # print(type(txtcode))
     print("=======décoder========")
     print(hu.decoder_texte(hu.texte_coder))
+    print("=======valeur de compression=======")
+    print(hu.valeur_compression())
