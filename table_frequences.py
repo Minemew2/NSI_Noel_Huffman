@@ -131,21 +131,21 @@ class Compression_Huffman:
         texte_decoder = ""
         listetravail = [int(x) for x in str(f)]
         for x in listetravail:
-            if x == 1:
+            if x == 0:
                 noeud = noeud.fgauche
                 if noeud.contenu is not None:
                     if noeud.est_feuille:
                         texte_decoder += noeud.contenu
                         noeud = arbre_decode.racine
 
-            elif x == 0:
+            elif x == 1:
                 noeud = noeud.fdroit
                 if noeud.contenu is not None:
                     if noeud.est_feuille:
                         texte_decoder += noeud.contenu
                         noeud = arbre_decode.racine
-            print(texte_decoder)
 
+        return texte_decoder
 
 if __name__ == "__main__":
     # ch = Compression_Huffman()
@@ -162,7 +162,10 @@ if __name__ == "__main__":
     # print(fichier_texte)
 
     hu = Compression_Huffman()
-    hu.coder_texte("texte.txt")
+    print(hu.coder_texte("texte.txt"))
     txtcode = hu.texte_coder
-    print(type(txtcode))
-    hu.decoder_texte(hu.texte_coder)
+    # f = open("textecoder.txt", "r")
+    # print("longueur texte", len(f.read()))
+    # print(type(txtcode))
+    print("=======décoder========")
+    print(hu.decoder_texte(hu.texte_coder))
