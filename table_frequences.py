@@ -115,6 +115,15 @@ class Compression_Huffman:
 
         return texte_code
 
+    def Coder_texte(self,str):
+        codage_binaire = self.dict_bin[str[0]][0]
+        self.first_car = self.dict_bin[str[0]]
+        for car in range(1,len(str)):
+            codage_binaire = codage_binaire << len(bin(self.dict_bin[str[car]][0]))-2
+            codage_binaire = codage_binaire | self.dict_bin[str[car]][0]
+
+        return bin(codage_binaire)
+
     def decoder_texte(self, fichiercoder):
         f = fichiercoder
         arbre_decode = self.arbre
