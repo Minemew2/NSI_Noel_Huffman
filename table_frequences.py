@@ -80,10 +80,9 @@ class Compression_Huffman:
     def Coder_binaire(self, dictionnaire):
         dico_binaire = {}
         for element in dictionnaire.items():
-            dico_binaire[element[0]] = (int(element[1], 2), len(element[1]))
+            self.dict_bin[element[0]] = (int(element[1], 2), len(element[1]))
 
-        return dico_binaire
-
+        return self.dict_bin
     def ajouter_texte(self, fichier):
         texte = open(fichier, "r")
         variable_texte = texte.read()
@@ -115,18 +114,18 @@ class Compression_Huffman:
     #
     #     return texte_code
 
-    def Coder_texte(self,str):
-        texte = self.ajouter_texte(str)
+    def Coder_texte(self,string):
+        texte = self.ajouter_texte(string)
         self.table_frequences(texte)
         self.table_frequences_rangee()
         self.Construire_arbre(self.tab_frq[0][0], self.tab_frq[1][0])
-        self.Coder_pseudo_binaire(self.arbre.racine)
         dico_trie = self.Coder_binaire(self.dict_bin)
-        codage_binaire = self.dict_bin[str[0]][0]
-        self.first_car = self.dict_bin[str[0]]
-        for car in range(1,len(str)):
-            codage_binaire = codage_binaire << len(bin(self.dict_bin[str[car]][0]))-2
-            codage_binaire = codage_binaire | self.dict_bin[str[car]][0]
+        codage_binaire = dico_trie[string[0]][0]
+        print(self.dict_bin[string[0]])
+        self.first_car = dico_trie[string[0]]
+        for car in range(1,len(string)):
+            codage_binaire = codage_binaire << len(bin(dico_trie[string[car]][0]))-2
+            codage_binaire = codage_binaire | dico_trie[string[car]][0]
 
         return bin(codage_binaire)
 
