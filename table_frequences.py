@@ -89,31 +89,31 @@ class Compression_Huffman:
         variable_texte = texte.read()
         return variable_texte
 
-    # def coder_texte(self, fichier):
-    #     texte = self.ajouter_texte(fichier)
-    #     self.table_frequences(texte)
-    #     self.table_frequences_rangee()
-    #     self.Construire_arbre(self.tab_frq[0][0], self.tab_frq[1][0])
-    #     self.Coder_pseudo_binaire(self.arbre.racine)
-    #     dico_trie = self.Coder_binaire(self.dict_bin)
-    #     # on écrit dans le fichier texte avec des vrais nombres
-    #     texte_code = ""
-    #     for x in texte:
-    #         ajout = dico_trie.get(x)
-    #         passage = bin(ajout[0])
-    #         for deux in range(2):
-    #             passage = passage[1:]
-    #         texte_code += passage
-    #     texte_code = int(texte_code)
-    #
-    #     f = open("textecoder.txt", "w+")
-    #     f.truncate(0)  # on efface le contenu du fichier, au cas où il y a déjà des choses dedans
-    #     f.write("%d" % texte_code)  # c'est du texte, mais la variable texte_code
-    #     # reste compressé
-    #
-    #     self.texte_coder += int(texte_code)
-    #
-    #     return texte_code
+    def coder_texte(self, fichier):
+         texte = self.ajouter_texte(fichier)
+         self.table_frequences(texte)
+         self.table_frequences_rangee()
+         self.Construire_arbre(self.tab_frq[0][0], self.tab_frq[1][0])
+         self.Coder_pseudo_binaire(self.arbre.racine)
+         dico_trie = self.Coder_binaire(self.dict_bin)
+         # on écrit dans le fichier texte avec des vrais nombres
+         texte_code = ""
+         for x in texte:
+             ajout = dico_trie.get(x)
+             passage = bin(ajout[0])
+             for deux in range(2):
+                 passage = passage[1:]
+             texte_code += passage
+         texte_code = int(texte_code)
+
+         f = open("textecoder.txt", "w+")
+         f.truncate(0)  # on efface le contenu du fichier, au cas où il y a déjà des choses dedans
+         f.write("%d" % texte_code)  # c'est du texte, mais la variable texte_code
+         # reste compressé
+
+         self.texte_coder += int(texte_code)
+
+         return texte_code
 
     def Coder_texte(self,str):
         texte = self.ajouter_texte(str)
@@ -177,7 +177,7 @@ if __name__ == "__main__":
     # print(fichier_texte)
 
     hu = Compression_Huffman()
-    print(hu.Coder_texte("texte.txt"))
+    print(hu.coder_texte("texte.txt"))
     txtcode = hu.texte_coder
     # f = open("textecoder.txt", "r")
     # print("longueur texte", len(f.read()))
