@@ -116,6 +116,12 @@ class Compression_Huffman:
     #     return texte_code
 
     def Coder_texte(self,str):
+        texte = self.ajouter_texte(str)
+        self.table_frequences(texte)
+        self.table_frequences_rangee()
+        self.Construire_arbre(self.tab_frq[0][0], self.tab_frq[1][0])
+        self.Coder_pseudo_binaire(self.arbre.racine)
+        dico_trie = self.Coder_binaire(self.dict_bin)
         codage_binaire = self.dict_bin[str[0]][0]
         self.first_car = self.dict_bin[str[0]]
         for car in range(1,len(str)):
