@@ -1,15 +1,15 @@
 from arbre_bin import *
 
-
-class Compression_Huffman:
+class Compression_Huffman :
     def __init__(self):
         self.dict_car = {}
         self.tab_frq = []
         self.arbre = None
         self.dict_bin = {}
-        self.texte_coder = 0
+        self.txt = ""
+        self.first_car = None
 
-    def table_frequences(self, texte):
+    def table_frequences(self,texte):
         for car in texte:
             if not car in self.dict_car:
                 self.dict_car[car] = 1
@@ -17,36 +17,38 @@ class Compression_Huffman:
                 self.dict_car[car] = self.dict_car[car] + 1
         return self.dict_car
 
-    def permutation(self, tableau, index1, index2):
+    def permutation(self,tableau,index1,index2) :
         save = tableau[index1]
         tableau[index1] = tableau[index2]
         tableau[index2] = save
         return tableau
 
-    def tri(self, tableau):
+    def tri(self,tableau):
         index_candidat = 0
         index_best = 0
         compteur = 1
         while compteur != len(tableau):
-            for x in range(compteur, len(tableau)):
+            for x in range(compteur,len(tableau)) :
                 if tableau[index_candidat][1] > tableau[x][1]:
                     index_candidat = x
-            tableau = self.permutation(tableau, index_best, index_candidat)
+            tableau = self.permutation(tableau,index_best,index_candidat)
             index_candidat = compteur
             compteur += 1
             index_best = index_candidat
-
+        
         return tableau
+
 
     def table_frequences_rangee(self):
         for car, nbr in self.dict_car.items():
-            self.tab_frq.append((car, nbr))
-
+            self.tab_frq.append((car,nbr))
+        
         self.tab_frq = self.tri(self.tab_frq)
 
         return self.tab_frq
+        
 
-    def Construire_arbre(self, n1, n2):
+    def Construire_arbre(self,n1,n2):
         if len(self.tab_frq) <= 2:
             if type(n1) is not Noeud_bin:
                 n1 = Noeud_bin(self.tab_frq[0][0])
@@ -54,80 +56,46 @@ class Compression_Huffman:
             if type(n2) is not Noeud_bin:
                 n2 = Noeud_bin(self.tab_frq[1][0])
             ng = self.tab_frq[1][0]
-            self.arbre = Arbre_bin(Noeud_bin(None, n2, n1))
+            self.arbre = Arbre_bin(Noeud_bin(None,n2,n1))
 
         else:
-            if type(n1) is not Noeud_bin:
+            if type(n1) is not Noeud_bin :
                 n1 = Noeud_bin(self.tab_frq[0][0])
             o1 = self.tab_frq[0][1]
             if type(n2) is not Noeud_bin:
                 n2 = Noeud_bin(self.tab_frq[1][0])
             o2 = self.tab_frq[1][1]
-            n3 = Noeud_bin(None, n2, n1)
+            n3 = Noeud_bin(None,n1,n2)
             self.tab_frq = self.tab_frq[2:]
-            self.tab_frq.insert(0, (n3, o1 + o2))
-            self.Construire_arbre(self.tab_frq[0][0], self.tab_frq[1][0])
+            self.tab_frq.append((n3,o1+o2))
+            self.tab_frq = self.tri(self.tab_frq)
+            self.Construire_arbre(self.tab_frq[0][0],self.tab_frq[1][0])
 
-    def Coder_pseudo_binaire(self, noeud, bin=""):
+    def  Coder_binaire(self,noeud,str_bin=""):
         if noeud.est_feuille():
-            self.dict_bin[noeud.contenu] = bin
+            codage = int("0b"+str_bin,2)
+            self.dict_bin[noeud.contenu] = (codage,len(str_bin))
         else:
-            self.Coder_pseudo_binaire(noeud.fgauche, bin + "0")
-            self.Coder_pseudo_binaire(noeud.fdroit, bin + "1")
+            self.Coder_binaire(noeud.fgauche,str_bin+"0")
+            self.Coder_binaire(noeud.fdroit,str_bin+"1")
+        
 
         return self.dict_bin
 
-    def Coder_binaire(self, dictionnaire):
-        dico_binaire = {}
-        for element in dictionnaire.items():
-            self.dict_bin[element[0]] = (int(element[1], 2), len(element[1]))
+    def Ajouter_texte(self,path):
+        file = open(path)
+        self.txt = file.read()
 
-        return self.dict_bin
-    def ajouter_texte(self, fichier):
-        texte = open(fichier, "r")
-        variable_texte = texte.read()
-        return variable_texte
+        return self.txt
 
-    # def coder_texte(self, fichier):
-    #     texte = self.ajouter_texte(fichier)
-    #     self.table_frequences(texte)
-    #     self.table_frequences_rangee()
-    #     self.Construire_arbre(self.tab_frq[0][0], self.tab_frq[1][0])
-    #     self.Coder_pseudo_binaire(self.arbre.racine)
-    #     dico_trie = self.Coder_binaire(self.dict_bin)
-    #     # on écrit dans le fichier texte avec des vrais nombres
-    #     texte_code = ""
-    #     for x in texte:
-    #         ajout = dico_trie.get(x)
-    #         passage = bin(ajout[0])
-    #         for deux in range(2):
-    #             passage = passage[1:]
-    #         texte_code += passage
-    #     texte_code = int(texte_code)
-    #
-    #     f = open("textecoder.txt", "w+")
-    #     f.truncate(0)  # on efface le contenu du fichier, au cas où il y a déjà des choses dedans
-    #     f.write("%d" % texte_code)  # c'est du texte, mais la variable texte_code
-    #     # reste compressé
-    #
-    #     self.texte_coder += int(texte_code)
-    #
-    #     return texte_code
+    def Coder_texte(self,str):
+        codage_binaire = self.dict_bin[str[0]][0]
+        self.first_car = self.dict_bin[str[0]]
+        for car in range(1,len(str)):
+            codage_binaire = codage_binaire << self.dict_bin[str[car]][1]
+            codage_binaire = codage_binaire | self.dict_bin[str[car]][0]
 
-    def Coder_texte(self,string):
-        texte = self.ajouter_texte(string)
-        self.table_frequences(texte)
-        self.table_frequences_rangee()
-        self.Construire_arbre(self.tab_frq[0][0], self.tab_frq[1][0])
-        dico_trie = self.Coder_binaire(self.dict_bin)
-        codage_binaire = dico_trie[string[0]][0]
-        print(self.dict_bin[string[0]])
-        self.first_car = dico_trie[string[0]]
-        for car in range(1,len(string)):
-            codage_binaire = codage_binaire << len(bin(dico_trie[string[car]][0]))-2
-            codage_binaire = codage_binaire | dico_trie[string[car]][0]
-
-        return bin(codage_binaire)
+        return codage_binaire
 
     def decoder_texte(self, fichiercoder):
         f = fichiercoder
@@ -152,36 +120,23 @@ class Compression_Huffman:
 
         return texte_decoder
 
-    def valeur_compression(self, fichier="texte.txt"):
-        f = open(fichier, "r")
-        poids_decode = len(f.read())  # en octets
-        poids_code = len(str(self.texte_coder))//8  # en octets
+    def valeur_compression(self):
+        poids_decode = len(self.txt)  # en octets
+        poids_code = (len(str(bin(self.Coder_texte(self.txt))))-2)//8  # en octets
         print(poids_code, " VS ", poids_decode)
 
         print("la valeur de compression est de ", (poids_code/poids_decode)*100, "%")
         return poids_code/poids_decode*100
 
-if __name__ == "__main__":
-    # ch = Compression_Huffman()
-    # dict = ch.table_frequences("eeaaaapppppddd")
-    # print(dict)
-    # print(ch.table_frequences_rangee())
-    # ch.Construire_arbre(ch.tab_frq[0][0], ch.tab_frq[1][0])
+if __name__=="__main__":
+    ch = Compression_Huffman()
+    txt = ch.Ajouter_texte("/home/minemew2/Documents/NSI/TAD/Arbre/Compression_Huffman/extrait_proust.txt")
+    ch.table_frequences(txt)
+    ch.table_frequences_rangee()
+    ch.Construire_arbre(ch.tab_frq[0][0],ch.tab_frq[1][0])
     # ch.arbre.Parcours_largeur(ch.arbre.racine)
-    # print(ch.arbre.racine.fgauche.contenu)
-    # print(ch.Coder_pseudo_binaire(ch.arbre.racine))
-    # print("vrai binaire :")
-    # print(ch.Coder_binaire(ch.dict_bin))
-    # fichier_texte = ch.ajouter_texte("texte.txt")
-    # print(fichier_texte)
-
-    hu = Compression_Huffman()
-    print(hu.Coder_texte("texte.txt"))
-    txtcode = hu.texte_coder
-    # f = open("textecoder.txt", "r")
-    # print("longueur texte", len(f.read()))
-    # print(type(txtcode))
-    print("=======décoder========")
-    print(hu.decoder_texte(hu.texte_coder))
-    print("=======valeur de compression=======")
-    print(hu.valeur_compression())
+    # # print(ch.arbre.racine.fgauche.contenu)
+    cod_bin = ch.Coder_binaire(ch.arbre.racine)
+    codage = ch.Coder_texte(txt)
+    print(ch.decoder_texte(int(bin(codage)[1:][1:])))
+    print(ch.valeur_compression())
